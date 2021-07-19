@@ -1,0 +1,19 @@
+{
+  "name": "com.appalachia.web.youtrack",
+  "version": "1.0.0",
+  "description": "Workflow and actions for YouTrack",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AppalachiaInteractive/com.appalachia.web.youtrack.git"
+  },
+  "author": "Appalachia Interactive",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AppalachiaInteractive/com.appalachia.web.youtrack/issues"
+  },
+  "homepage": "https://github.com/AppalachiaInteractive/com.appalachia.web.youtrack#readme"
+}

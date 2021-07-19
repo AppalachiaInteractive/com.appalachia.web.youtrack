@@ -1,11 +1,11 @@
 const entities = require("@jetbrains/youtrack-scripting-api/entities");
 const search = require("@jetbrains/youtrack-scripting-api/search");
-const appalachia = require("youtrack-appalachia/appalachia");
+const appalachia = require('appalachia/appalachia');
 
 exports.rule = entities.Issue.action({
   title: "Populate Release Features",
-  command: "populate-release-features",
-  guard: (ctx) => appalachia.guards.featureSet(ctx.issue),
+  command: "feature-release",
+  guard: appalachia.guards.featureSet,
   action: (ctx) => {
     const issue = ctx.issue;
 
