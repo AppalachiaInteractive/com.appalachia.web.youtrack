@@ -10,7 +10,7 @@ module.exports = {
   screen: (ctx) => {
     return ctx.issue.fields["Category"].presentation == "Screen";
   },
-  hudOverlay: (ctx) => {
+  hude: (ctx) => {
     return ctx.issue.fields["Category"].presentation == "HUD Overlay";
   },
   build: (ctx) => {

@@ -14,8 +14,7 @@ function cleanTag(tag) {
     .trim();
 }
 
-function getIssue(ctx, project, v) {
-  const query = "'" + v.sum + "'";
+function getIssue(ctx, project, query) {
   var matches = search.search(project, query, ctx.currentUser);
 
   var existing = null;
@@ -119,7 +118,8 @@ function createComplexIssues(
     var user = entities.User.findByLogin(userName);
     var owner = appalachia_entities.owners[userName];
 
-    var existing = getIssue(ctx, project, v);
+    const query = "'" + parentIssue.summary + "' and '" + v.sum + "'";
+    var existing = getIssue(ctx, project, query);
 
     issues[k] = existing;
 

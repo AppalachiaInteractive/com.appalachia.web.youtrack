@@ -27,6 +27,7 @@ function addBuild() {
   entries['pr-ro'] = { pk: 'PROD',    sum: 'Royalty Reporting',       pts: 10, deps: ['pr-ac'] };
 }
 
+
 function addBase(entries) {
   
   entries['ca-00'] = { pk: 'CONCEPT', sum: '',                    pts: 10, deps: [] };
@@ -43,43 +44,55 @@ function addBase(entries) {
   entries['sy-md'] = { pk: 'CODE',    sum: 'Metadata',            pts: 06, deps: ['sy-00'] };
   entries['u3-md'] = { pk: 'UNITY',   sum: 'Metadata',            pts: 06, deps: ['u3-00','sy-md'] };
 
-  entries['ga-ex'] = { pk: 'GAME',    sum: 'Experience',          pts: 02, deps: ['ga-00'] };
-  entries['sy-ex'] = { pk: 'CODE',    sum: 'Experience',          pts: 06, deps: ['ga-ex','sy-00'] };
-  entries['ui-ex'] = { pk: 'UI',      sum: 'Experience',          pts: 04, deps: ['sy-ex','u3-00','u3-md'] };
-  entries['u3-ex'] = { pk: 'UNITY',   sum: 'Experience',          pts: 04, deps: ['u3-00','ui-ex'] };
-
-  entries['ga-ac'] = { pk: 'GAME',    sum: 'Achievements',        pts: 06, deps: ['ga-00'] };
-  entries['sy-ac'] = { pk: 'CODE',    sum: 'Achievements',        pts: 06, deps: ['ga-ac','sy-00'] };
-  entries['ui-ac'] = { pk: 'UI',      sum: 'Achievements',        pts: 04, deps: ['sy-ac','u3-00','u3-md'] };
-  entries['u3-ac'] = { pk: 'UNITY',   sum: 'Achievements',        pts: 04, deps: ['u3-00','ui-ac'] };
-
-  entries['ga-st'] = { pk: 'GAME',    sum: 'Stats',               pts: 02, deps: ['ga-00'] };
-  entries['sy-st'] = { pk: 'CODE',    sum: 'Stats',               pts: 06, deps: ['ga-st','sy-00'] };
-  entries['ui-st'] = { pk: 'UI',      sum: 'Stats',               pts: 04, deps: ['sy-st','u3-00','u3-md'] };
-  entries['u3-st'] = { pk: 'UNITY',   sum: 'Stats',               pts: 04, deps: ['u3-00','ui-st'] };
-
-  entries['ga-se'] = { pk: 'GAME',    sum: 'Settings',            pts: 02, deps: ['ga-00'] };
-  entries['sy-se'] = { pk: 'CODE',    sum: 'Settings',            pts: 06, deps: ['ga-se','sy-00'] };
-  entries['ui-se'] = { pk: 'UI',      sum: 'Settings',            pts: 06, deps: ['sy-se','u3-00','u3-md','vx-se'] };
-  entries['u3-se'] = { pk: 'UNITY',   sum: 'Settings',            pts: 06, deps: ['u3-00','ui-se'] };
-  
-  entries['u3-pf'] = { pk: 'UNITY',   sum: 'Prefab Creation',     pts: 10, deps: ['sy-00','u3-00'] };
-
   entries['qa-00'] = { pk: 'QA',      sum: '',                    pts: 02, deps: ['u3-00'] };
-  entries['qa-ex'] = { pk: 'QA',      sum: 'Experience',          pts: 02, deps: ['qa-00'] };
-  entries['qa-ac'] = { pk: 'QA',      sum: 'Achievements',        pts: 02, deps: ['qa-00'] };
-  entries['qa-st'] = { pk: 'QA',      sum: 'Stats',               pts: 02, deps: ['qa-00'] };
-  entries['qa-se'] = { pk: 'QA',      sum: 'Settings',            pts: 02, deps: ['qa-00'] };
 
   entries['pr-rp'] = { pk: 'PROD',    sum: 'Release Plan',        pts: 04, deps: ['qa-00'] };
   entries['da-an'] = { pk: 'DATA',    sum: 'Analytics',           pts: 04, deps: ['u3-pf'] };
   entries['md-sm'] = { pk: 'MEDIA',   sum: 'Media Shots + Post',  pts: 04, deps: ['u3-pf'] };
 }
 
+function addExperience(entries) {
+  entries['ga-ex'] = { pk: 'GAME',    sum: 'Experience',          pts: 02, deps: ['ga-00'] };
+  entries['sy-ex'] = { pk: 'CODE',    sum: 'Experience',          pts: 06, deps: ['ga-ex','sy-00'] };
+  entries['ui-ex'] = { pk: 'UI',      sum: 'Experience',          pts: 04, deps: ['sy-ex','u3-00','u3-md'] };
+  entries['u3-ex'] = { pk: 'UNITY',   sum: 'Experience',          pts: 04, deps: ['u3-00','ui-ex'] };
+  entries['qa-ex'] = { pk: 'QA',      sum: 'Experience',          pts: 02, deps: ['qa-00'] };
+}
+
+function addAchievements(entries) {
+  entries['ga-ac'] = { pk: 'GAME',    sum: 'Achievements',        pts: 06, deps: ['ga-00'] };
+  entries['sy-ac'] = { pk: 'CODE',    sum: 'Achievements',        pts: 06, deps: ['ga-ac','sy-00'] };
+  entries['ui-ac'] = { pk: 'UI',      sum: 'Achievements',        pts: 04, deps: ['sy-ac','u3-00','u3-md'] };
+  entries['u3-ac'] = { pk: 'UNITY',   sum: 'Achievements',        pts: 04, deps: ['u3-00','ui-ac'] };
+  entries['qa-ac'] = { pk: 'QA',      sum: 'Achievements',        pts: 02, deps: ['qa-00'] };
+}
+
+function addStats(entries) {
+  entries['ga-st'] = { pk: 'GAME',    sum: 'Stats',               pts: 02, deps: ['ga-00'] };
+  entries['sy-st'] = { pk: 'CODE',    sum: 'Stats',               pts: 06, deps: ['ga-st','sy-00'] };
+  entries['ui-st'] = { pk: 'UI',      sum: 'Stats',               pts: 04, deps: ['sy-st','u3-00','u3-md'] };
+  entries['u3-st'] = { pk: 'UNITY',   sum: 'Stats',               pts: 04, deps: ['u3-00','ui-st'] };
+  entries['qa-st'] = { pk: 'QA',      sum: 'Stats',               pts: 02, deps: ['qa-00'] };
+}
+
+function addSettings(entries) {
+  entries['ga-se'] = { pk: 'GAME',    sum: 'Settings',            pts: 02, deps: ['ga-00'] };
+  entries['sy-se'] = { pk: 'CODE',    sum: 'Settings',            pts: 06, deps: ['ga-se','sy-00'] };
+  entries['ui-se'] = { pk: 'UI',      sum: 'Settings',            pts: 06, deps: ['sy-se','u3-00','u3-md','vx-se'] };
+  entries['u3-se'] = { pk: 'UNITY',   sum: 'Settings',            pts: 06, deps: ['u3-00','ui-se'] };
+  entries['qa-se'] = { pk: 'QA',      sum: 'Settings',            pts: 02, deps: ['qa-00'] };
+}
+
 function addAsset(entries) {  
-  if (!('ca-00' in entries)) {
-    addBase(entries);
-  }  
+  addExperience(entries);
+  addAchievements(entries);
+  addStats(entries);
+  addSettings(entries);
+
+  entries['u3-pf'] = { pk: 'UNITY',   sum: 'Prefab Creation',     pts: 10, deps: ['sy-00','u3-00'] };
+}
+
+function addModels(entries) {  
 
   entries['ca-00'].pts = 20;
   entries['ga-00'].pts = 06;
@@ -103,10 +116,8 @@ function addAsset(entries) {
   entries['re-ac'] = { pk: 'REACT',   sum: 'Authenticity',        pts: 04, deps: ['u3-pf'] };
 }
 
-function addAnimation(entries) {   
-  if (!('ca-00' in entries)) {
-    addBase(entries);
-  } 
+function addAnimation(entries) {  
+
   entries['ga-an'] = { pk: 'GAME',    sum: 'Animation',           pts: 02, deps: ['ga-00'] };
   entries['an-rg'] = { pk: 'ANIM',    sum: 'Rigging',             pts: 10, deps: ['ga-an'] };
   entries['an-an'] = { pk: 'ANIM',    sum: 'Animation',           pts: 10, deps: ['an-rg'] };
@@ -119,10 +130,6 @@ function addAnimation(entries) {
 }
 
 function addGameplay(entries) {
-  
-  if (!('ga-an' in entries)) {
-    addAnimation(entries);
-  }
 
   entries['ca-00'].pts = 20;
   entries['ga-00'].pts = 06;
@@ -149,9 +156,6 @@ function addGameplay(entries) {
 }
 
 function addUserInput(entries) {  
-  if (!('ga-00' in entries)) {
-    addBase(entries);
-  } 
 
   entries['ga-ui'] = { pk: 'GAME',    sum: 'User Input',          pts: 04, deps: ['ga-00'] };
   entries['sy-ui'] = { pk: 'CODE',    sum: 'User Input',          pts: 06, deps: ['ga-ui'] };
@@ -161,10 +165,7 @@ function addUserInput(entries) {
 }
 
 function addInventory(entries) {
-  if (!('u3-00' in entries)) {
-    addAsset(entries);
-  }  
-
+  
   entries['ga-in'] = { pk: 'GAME',    sum: 'Inventory',           pts: 04, deps: ['ga-00'] };
   entries['sy-in'] = { pk: 'CODE',    sum: 'Inventory',           pts: 06, deps: ['ga-in'] };
   entries['ui-in'] = { pk: 'UI',      sum: 'Inventory',           pts: 12, deps: ['sy-in','u3-00'] };
@@ -173,12 +174,6 @@ function addInventory(entries) {
 }
 
 function addCrafting(entries) {  
-  if (!('ga-in' in entries)) {
-    addInventory(entries);
-  }  
-  if (!('an-rg' in entries)) {
-    addAnimation(entries);
-  }  
 
   entries['ca-cr'] = { pk: 'CONCEPT', sum: 'Crafting',            pts: 10, deps: ['ca-00'] };
   entries['ga-cr'] = { pk: 'GAME',    sum: 'Crafting',            pts: 06, deps: ['ca-cr','ga-in'] };
@@ -209,9 +204,6 @@ function addCrafting(entries) {
 }
 
 function addUpgrades(entries) {  
-  if (!('ga-cr' in entries)) {
-    addCrafting(entries);
-  }  
 
   entries['ca-up'] = { pk: 'CONCEPT', sum: 'Upgrades',            pts: 10, deps: ['ca-00'] };
   entries['ga-up'] = { pk: 'GAME',    sum: 'Upgrades',            pts: 06, deps: ['ca-up','ga-cr'] };
@@ -223,10 +215,7 @@ function addUpgrades(entries) {
   entries['qa-up'] = { pk: 'QA',      sum: 'Upgrades',            pts: 02, deps: ['u3-up','qa-00'] };
 }
 
-function addHarvesting(entries) {  
-  if (!('ga-in' in entries)) {
-    addInventory(entries);
-  }  
+function addHarvesting(entries) {
 
   entries['ca-ha'] = { pk: 'CONCEPT', sum: 'Harvesting',          pts: 10, deps: ['ca-00'] };
   entries['ga-ha'] = { pk: 'GAME',    sum: 'Harvesting',          pts: 06, deps: ['ca-ha','ga-in'] };
@@ -239,22 +228,39 @@ function addHarvesting(entries) {
 
 function addAI(entries) {
 
-  if (!('ca-ha' in entries)) {
-    addHarvesting(entries);
-  }  
-
   entries['ga-ai'] = { pk: 'GAME',    sum: 'AI',                  pts: 08, deps: ['ga-00'] };
   entries['sy-ai'] = { pk: 'AI',      sum: 'AI',                  pts: 20, deps: ['ga-ai'] };
   entries['u3-ai'] = { pk: 'UNITY',   sum: 'AI',                  pts: 10, deps: ['sy-ai','u3-md'] };
   entries['qa-ai'] = { pk: 'QA',      sum: 'AI',                  pts: 04, deps: ['u3-ai','qa-00'] };
 }
 
-
 function addFeathers(entries) {
   entries['te-fe'] = { pk: 'TEXTURE', sum: 'Feathers',            pts: 04, deps: ['te-00'] };
 }
 
+function addScreen(entries) {
 
+  entries['ca-00'].pts = 20;
+  entries['ca-00'].sum = 'UI Concept Art'
+
+  entries['ui-ux'] = { pk: 'UI',      sum: 'UX Research',              pts: 20, deps: [] };
+  entries['ui-ia'] = { pk: 'UI',      sum: 'Information Architecture', pts: 10, deps: ['ui-ux'] };
+  entries['sy-ba'] = { pk: 'CODE',      sum: 'Backend API',              pts: 10, deps: ['ui-ia'] };
+  entries['ui-pr'] = { pk: 'UI',      sum: 'UI Prototype',             pts: 20, deps: ['ca-00','ui-ux','ui-ia'] };
+  entries['ui-fr'] = { pk: 'UI',      sum: 'Frontend Implementation',  pts: 20, deps: ['ui-ia','ui-pr','ui-sy'] };
+  entries['ui-un'] = { pk: 'UI',      sum: 'Unit Testing',             pts: 10, deps: ['ui-fr'] };
+  entries['ui-ap'] = { pk: 'UI',      sum: 'API Integration',          pts: 10, deps: ['ui-fr','sy-ba'] };
+  entries['ui-de'] = { pk: 'UI',      sum: 'Developer Testing',        pts: 16, deps: ['ui-ap','ui-un'] };
+
+  entries['qa-00'].pts = 20;
+  entries['qa-00'].deps.push('ui-de');
+}
+
+
+function addHUD(entries) {
+  
+  addScreen(entries);
+}
 
 function validateEntries(entries) {
   for (const [k, v] of Object.entries(entries)) {
@@ -308,10 +314,32 @@ function getBuild() {
   return entries;
 }
 
-function getGrass() {
+function getFlora() {
+  
   const entries = {};
 
+  addBase(entries);
+  addExperience(entries);
+  addAchievements(entries);
+  addSettings(entries);
+  addStats(entries);
   addAsset(entries);
+  addModels(entries);
+  //addAnimation(entries);
+  addInventory(entries);
+  //addCrafting(entries);
+  //addUpgrades(entries);
+  addHarvesting(entries);
+  //addGameplay(entries);
+  //addUserInput(entries);
+  //addAI(entries);
+
+  return entries;
+}
+
+function getGrass() {
+
+  const entries = getFlora();
 
   entries["ca-00"].points = 10;
   entries["ga-00"].points = 06;
@@ -331,9 +359,7 @@ function getGrass() {
 }
 
 function getPlant() {
-  const entries = {};
-
-  addAsset(entries);
+  const entries = getFlora();
 
   entries["ca-00"].points = 10;
   entries["ga-00"].points = 06;
@@ -353,10 +379,7 @@ function getPlant() {
 }
 
 function getFungus() {
-  const entries = {};
-
-  addAsset(entries);
-  addHarvesting(entries);
+  const entries = getFlora();
 
   entries["ca-00"].points = 10;
   entries["ga-00"].points = 06;
@@ -376,10 +399,7 @@ function getFungus() {
 }
 
 function getCrop() {
-  const entries = {};
-
-  addAsset(entries);
-  addHarvesting(entries);
+  const entries = getFlora();
 
   entries["ca-00"].points = 10;
   entries["ga-00"].points = 06;
@@ -399,10 +419,7 @@ function getCrop() {
 }
 
 function getTree() {
-  const entries = {};
-
-  addAsset(entries);
-  addHarvesting(entries);
+  const entries = getFlora();
 
   entries["ca-00"].points = 10;
   entries["ga-00"].points = 06;
@@ -424,8 +441,20 @@ function getTree() {
 function getAnimal() {
   const entries = {};
 
+  addBase(entries);
+  addExperience(entries);
+  addAchievements(entries);
+  addSettings(entries);
+  addStats(entries);
   addAsset(entries);
+  addModels(entries);
+  addAnimation(entries);
+  addInventory(entries);
+  //addCrafting(entries);
+  //addUpgrades(entries);
   addHarvesting(entries);
+  addGameplay(entries);
+  //addUserInput(entries);
   addAI(entries);
 
   return entries;
@@ -459,9 +488,21 @@ function getReptile() {
 function getTechnology() {
   const entries = {};
 
+  addBase(entries);
+  addExperience(entries);
+  addAchievements(entries);
+  addSettings(entries);
+  addStats(entries);
   addAsset(entries);
+  addModels(entries);
+  addAnimation(entries);
+  addInventory(entries);
   addCrafting(entries);
   addUpgrades(entries);
+  //addHarvesting(entries);
+  addGameplay(entries);
+  addUserInput(entries);
+  //addAI(entries);
 
   return entries;
 }
@@ -470,8 +511,47 @@ function getAbility() {
   const entries = {};
 
   addBase(entries);
+  addExperience(entries);
+  addAchievements(entries);
+  addSettings(entries);
+  addStats(entries);
+  addAsset(entries);
+  //addModels(entries);
   addAnimation(entries);
+  //addInventory(entries);
+  //addCrafting(entries);
+  //addUpgrades(entries);
+  //addHarvesting(entries);
   addGameplay(entries);
+  addUserInput(entries);
+  //addAI(entries);
+
+  return entries;
+}
+
+function getScreen() {
+  const entries = {};
+
+  addBase(entries);
+  addExperience(entries);
+  addAchievements(entries);
+  addSettings(entries);
+  addStats(entries);
+  addScreen(entries);
+  addUserInput(entries);
+
+  return entries;
+}
+
+function getHUD() {
+  const entries = {};
+
+  addBase(entries);
+  addExperience(entries);
+  addAchievements(entries);
+  addSettings(entries);
+  addStats(entries);
+  addHUD(entries);
   addUserInput(entries);
 
   return entries;
@@ -493,5 +573,8 @@ module.exports = {
   getTechnology: validateEntries(getTechnology),
   getAbility: validateEntries(getAbility),
   
+  getScreen: validateEntries(getScreen),
+  getHUD: validateEntries(getHUD),
+
   getBuild: validateEntries(getBuild),
 };

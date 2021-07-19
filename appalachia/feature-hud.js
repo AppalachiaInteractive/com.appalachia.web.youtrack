@@ -2,20 +2,21 @@ const entities = require('@jetbrains/youtrack-scripting-api/entities');
 const appalachia = require('appalachia/appalachia');
 
 exports.rule = entities.Issue.action({
-  title: 'Populate Build',
-  command: 'feature-build',
-  guard: appalachia.guards.build,
+  title: 'Populate HUD',
+  command: 'feature-hud',
+  guard: appalachia.guards.hud,
   action: (ctx) => {    
-      
-    const entries = appalachia.features.getBuild();
+    
+    const entries = appalachia.features.getHUD();
 
     appalachia.populate.createComplexIssues(
       ctx,
       ctx.issue, 
       entries, 
       [],
-      ['Build']
+      ['HUD Overlay','UI']
       );
+
   },
   requirements: appalachia.requirements.featureRoadmap
 });
