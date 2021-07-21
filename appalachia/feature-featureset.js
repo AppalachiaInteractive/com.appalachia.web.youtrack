@@ -3,9 +3,11 @@ const search = require("@jetbrains/youtrack-scripting-api/search");
 const appalachia = require('appalachia/appalachia');
 
 exports.rule = entities.Issue.action({
-  title: "Populate Release Features",
-  command: "feature-release",
-  guard: appalachia.guards.featureSet,
+  title: "Populate Feature Set",
+  command: "feature-featureset",
+  guard: (ctx) => {
+    return ctx.issue.fields["Category"].presentation == "Feature Set";
+  },
   action: (ctx) => {
     const issue = ctx.issue;
 

@@ -14,25 +14,16 @@ function cleanTag(tag) {
     .trim();
 }
 
-function getIssue(ctx, project, query) {
-  var matches = search.search(project, query, ctx.currentUser);
+function getIssue(ctx, project, queries) {
+  for (const query of queries) {
+    var matches = search.search(project, query, ctx.currentUser);
 
-  var existing = null;
-
-  if (matches.isNotEmpty()) {
-    if (matches.length > 1) {
-      console.log(
-        "> " + query + "\nSkipping because of multiple matches\n" + matches
-      );
-      return null;
-    } else {
-      existing = matches.first();
-    }
-  } else {
-    existing = new entities.Issue(ctx.currentUser, project, "Task");
+    if (matches.isNotEmpty()) {
+      return matches.first();
+    }    
   }
 
-  return existing;
+  return null;
 }
 
 function updateIssue(existing, v, parentIssue, tag, project, user, owner) {
@@ -78,22 +69,22 @@ function updateLinks(issues, entries) {
   }
 }
 
-function updateSharedDeps(issues, sharedDeps) {
-  sharedDeps.forEach((sd) => {
-    const sharedDep = entities.Issue.findById(sd);
-
-    for (const [k, issue] of Object.entries(issues)) {
-      issue.links["depends on"].add(sharedDep);
-    }
+function updateSharedDeps(issues, parentIssue, sharedDepsIds) {
+  sharedDepsIds.forEach((id) => {
+    const sharedDep = entities.Issue.findById(id);
+    parentIssue.links["depends on"].add(sharedDep);
   });
 }
 
-function updateSharedTags(issues, sharedTags) {
+function updateSharedTags(issues, parentIssue, sharedTags) {
   for (const [k, issue] of Object.entries(issues)) {
     sharedTags.forEach((tag) => {
       issue.addTag(tag);
     });
   }
+  sharedTags.forEach((tag) => {
+    parentIssue.addTag(tag);
+  });
 }
 
 function createComplexIssues(
@@ -103,9 +94,7 @@ function createComplexIssues(
   sharedDeps,
   sharedTags
 ) {
-  console.log(
-    "createComplexIssues - " + parentIssue.id + " - " + parentIssue.summary
-  );
+  
   const parentSummary = parentIssue.summary;
   const tag = cleanTag(parentSummary);
   parentIssue.addTag(tag);
@@ -118,8 +107,28 @@ function createComplexIssues(
     var user = entities.User.findByLogin(userName);
     var owner = appalachia_entities.owners[userName];
 
-    const query = "'" + parentIssue.summary + "' and '" + v.sum + "'";
-    var existing = getIssue(ctx, project, query);
+    qpr = "project: {" + project.name + "}";
+    qpa = "'" + parentIssue.summary + "'";
+    qsa = "State: {Not Ready},Open";
+    qde = "Is required for: " + parentIssue.id;
+    qvs = "'" + v.sum + "'";
+
+    and = ' and ';
+
+    queries = [];
+
+    if (v.sum == '' ) {
+      queries.push(qpr + and + qpa + and + qsa + and + qde);
+    }
+    else{
+      queries.push(qpr + and + qpa + and + qsa + and + qvs + and + qde);
+    }
+    
+    var existing = getIssue(ctx, project, queries);
+
+    if (existing == null) {      
+      existing = new entities.Issue(ctx.currentUser, project, parentIssue.summary + " " + v.sum);
+    }
 
     issues[k] = existing;
 
@@ -127,8 +136,8 @@ function createComplexIssues(
   }
 
   updateLinks(issues, entries);
-  updateSharedDeps(issues, sharedDeps);
-  updateSharedTags(issues, sharedTags);
+  updateSharedDeps(issues, parentIssue, sharedDeps);
+  updateSharedTags(issues, parentIssue, sharedTags);
 }
 
 module.exports = {
