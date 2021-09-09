@@ -3,7 +3,6 @@ const search = require("@jetbrains/youtrack-scripting-api/search");
 const appalachia_entities = require("appalachia/workflow-entities");
 
 function setIssueToParentRelease(issue, dep, force) {
-  console.log("setIssueToParentRelease - " + issue.id + ' - ' + issue.summary);
 
   if (issue.project.isArchived || !issue.isReported) {
     return;
@@ -20,21 +19,24 @@ function setIssueToParentRelease(issue, dep, force) {
   }
 }
 
-function setDependencyReleases(issue, force) {
-  console.log("setDependencyReleases - " + issue.id + ' - ' + issue.summary);
+function setDependencyReleases(issue, linkType, force) {
 
-  if (issue.links["depends on"].isEmpty()) {
+  const links = issue.links[linkType];
+
+  if (!links || links.isEmpty()) {
     return;
   }
 
-  issue.links["depends on"].forEach(function (dep) {
+  links.forEach(function (dep) {
     setIssueToParentRelease(issue, dep, force);
 
-    if (dep.links["depends on"].isNotEmpty()) {
+    if (dep.links[linkType].isNotEmpty()) {
       setDependencyReleases(dep, force);
     }
   });
 }
+
+
 
 module.exports = {
   setDependencyReleases: setDependencyReleases,

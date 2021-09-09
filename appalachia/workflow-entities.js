@@ -10,6 +10,7 @@ owners["TBD"] = null;
 const assignees = {};
 assignees["3D"] = "chris";
 assignees["ACCESS"] = "chris";
+assignees["ADMIN"] = "chris";
 assignees["AI"] = "chris";
 assignees["ANIM"] = "chris";
 assignees["ASSET"] = "chris";
@@ -37,9 +38,10 @@ assignees["TECH"] = "chris";
 assignees["TEXTURE"] = "chris";
 assignees["UI"] = "janice";
 assignees["UICON"] = "bokbok";
-assignees["UX"] = "janice";
 assignees["UNITY"] = "TBD";
+assignees["UX"] = "janice";
 assignees["VFX"] = "chris";
+
 
 module.exports = {
   owners: owners,
