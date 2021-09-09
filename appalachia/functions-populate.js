@@ -26,21 +26,13 @@ function getIssue(ctx, project, queries) {
   return null;
 }
 
-function updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner) {
+function updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner) { 
+  
   parentIssue.links["parent for"].add(existing);
 
-  const name = parentIssue.summary + " " + v.sum;;
-  existing.summary = name.trim();
+  existing.summary = (parentIssue.summary + " " + v.sum).trim();
   existing.project = project;
   existing.fields["Target Release"] = parentIssue.fields["Target Release"];
-
-  if (existing.fields["State"].name == "Not Ready" || existing.fields["State"].name == "Open")
-  {
-    existing.fields.Assignee = user;
-    existing.fields.Points = v.pts;
-    existing.fields.Owner = owner;
-    existing.fields["Deliverable"] = v.dev;
-  }  
 
   existing.addTag(tag);
   existing.addTag("Auto-Generated");
@@ -50,6 +42,15 @@ function updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner) {
   if (tag2 !== "") {
     existing.addTag(tag2);
   }
+  
+  // contract protected fields
+  if (existing.fields["State"].name == "Not Ready" || existing.fields["State"].name == "Open")
+  {
+    existing.fields.Assignee = user;
+    existing.fields.Points = v.pts;
+    existing.fields.Owner = owner;
+    existing.fields["Deliverable"] = v.dev;
+  }  
 }
 
 function updateLinks(issues, entries) {
@@ -106,7 +107,7 @@ function createComplexIssues(
 
     qpr = "project: {" + project.name + "}";
     qpa = "'" + parentIssue.summary + "'";
-    qsa = "State: {Not Ready},Open,{In Progress}";
+    //qsa = "State: {Not Ready},Open,{In Progress}";
     qst = "Subtask of: " + parentIssue.id;
     qde = "Is required for: " + parentIssue.id;
     qvs = "'" + v.sum + "'";
@@ -116,14 +117,14 @@ function createComplexIssues(
     queries = [];
 
     if (v.sum == '' ) {
-      queries.push(qpr + and + qpa + and + qsa + and + qst);
-      queries.push(qpr + and + qpa + and + qsa + and + qde);
-      queries.push(qpr + and + qpa + and + qsa);
+      queries.push(qpr + and + qpa/* + and + qsa*/ + and + qst);
+      queries.push(qpr + and + qpa/* + and + qsa*/ + and + qde);
+      queries.push(qpr + and + qpa/* + and + qsa*/);
     }
     else{
-      queries.push(qpr + and + qpa + and + qsa + and + qvs + and + qst);
-      queries.push(qpr + and + qpa + and + qsa + and + qvs + and + qde);
-      queries.push(qpr + and + qpa + and + qsa + and + qvs);
+      queries.push(qpr + and + qpa/* + and + qsa*/ + and + qvs + and + qst);
+      queries.push(qpr + and + qpa/* + and + qsa*/ + and + qvs + and + qde);
+      queries.push(qpr + and + qpa/* + and + qsa*/ + and + qvs);
     }
     
     var existing = getIssue(ctx, project, queries);
