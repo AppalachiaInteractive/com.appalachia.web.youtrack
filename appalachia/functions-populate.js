@@ -26,11 +26,15 @@ function getIssue(ctx, project, queries) {
   return null;
 }
 
-function updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner) { 
+function getIssueName(v, parentIssue) {
+  return (parentIssue.summary + " " + v.sum).trim();
+}
+
+function updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner, watchers) { 
   
   parentIssue.links["parent for"].add(existing);
 
-  existing.summary = (parentIssue.summary + " " + v.sum).trim();
+  existing.summary = getIssueName(v, parentIssue);
   existing.project = project;
   existing.fields["Target Release"] = parentIssue.fields["Target Release"];
 
@@ -42,7 +46,7 @@ function updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner) {
   if (tag2 !== "") {
     existing.addTag(tag2);
   }
-  
+
   // contract protected fields
   if (existing.fields["State"].name == "Not Ready" || existing.fields["State"].name == "Open")
   {
@@ -51,6 +55,10 @@ function updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner) {
     existing.fields.Owner = owner;
     existing.fields["Deliverable"] = v.dev;
   }  
+
+  for (const watcher of watchers) {
+    watcher.watchIssue(existing); 
+  }
 }
 
 function updateLinks(issues, entries) {
@@ -103,29 +111,30 @@ function createComplexIssues(
     var project = entities.Project.findByKey(v.pk);
     var userName = appalachia_entities.assignees[v.pk];
     var user = entities.User.findByLogin(userName);
+    var watchers = [ entities.User.findByLogin(appalachia_entities.users.chris) ];
     var owner = appalachia_entities.owners[userName];
+    var issueName = getIssueName(v, parentIssue);
 
     qpr = "project: {" + project.name + "}";
-    qpa = "'" + parentIssue.summary + "'";
+    qpa = "summary: '" + issueName + "'";
     //qsa = "State: {Not Ready},Open,{In Progress}";
     qst = "Subtask of: " + parentIssue.id;
     qde = "Is required for: " + parentIssue.id;
-    qvs = "'" + v.sum + "'";
+    //qvs = "'"  "'";
 
     and = ' and ';
 
     queries = [];
 
-    if (v.sum == '' ) {
+    //if (v.sum == '' ) {
       queries.push(qpr + and + qpa/* + and + qsa*/ + and + qst);
       queries.push(qpr + and + qpa/* + and + qsa*/ + and + qde);
-      queries.push(qpr + and + qpa/* + and + qsa*/);
-    }
-    else{
-      queries.push(qpr + and + qpa/* + and + qsa*/ + and + qvs + and + qst);
-      queries.push(qpr + and + qpa/* + and + qsa*/ + and + qvs + and + qde);
-      queries.push(qpr + and + qpa/* + and + qsa*/ + and + qvs);
-    }
+    //}
+    //else{
+    //  queries.push(qpr + and + qpa/* + and + qsa*/ /*+ and + qvs*/ + and + qst);
+    //  queries.push(qpr + and + qpa/* + and + qsa*/ /*+ and + qvs*/ + and + qde);
+    //  queries.push(qpr + and + qpa/* + and + qsa*/ /*+ and + qvs*/);
+    //}
     
     var existing = getIssue(ctx, project, queries);
 
@@ -136,7 +145,7 @@ function createComplexIssues(
     issues[k] = existing;
 
     try {
-      updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner);
+      updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner, watchers);
     } catch (error) {
 
       console.error(error + ": " + JSON.stringify(v));
@@ -154,8 +163,8 @@ function validateEntries(entries) {
   for (const [k, v] of Object.entries(entries)) {
     v.pts = Math.round(v.pts);
 
-    if (v.pts < 1) {
-      v.pts = 1;
+    if (v.pts < .1) {
+      v.pts = .1;
     }
   }
 
@@ -378,9 +387,9 @@ function addInventory(entries) {
   entries['qa-in'] = { pk: 'QA',      sum: 'Inventory',           pts: 0.1, dev: "QA Screenshots", deps: ['u3-in','qa-00'] };
 }
 
-function addCrafting(entries) {  
-  entries['ca-cr'] = { pk: 'CONCEPT', sum: 'Crafting',            pts: 0.6, dev: "Illustration", deps: ['ca-00'] };
-  entries['ga-cr'] = { pk: 'GAME',    sum: 'Crafting',            pts: 0.3, dev: "Design Update", deps: ['ca-cr','ga-in'] };
+function addCrafting(entries) { 
+  entries['ca-00'].pts += 0.6;
+  entries['ga-cr'] = { pk: 'GAME',    sum: 'Crafting',            pts: 0.3, dev: "Design Update", deps: ['ca-00','ga-in'] };
   entries['an-cr'] = { pk: 'ANIM',    sum: 'Crafting',            pts: 0.3, dev: "FBX Animation", deps: ['ga-cr','an-rg','3d-00','3d-up','3d-wt'] };
   entries['ad-cr'] = { pk: 'AUDIO',   sum: 'Crafting',            pts: 0.3, dev: "WAV File", deps: ['ga-cr','an-cr'] };
   entries['sy-cr'] = { pk: 'CODE',    sum: 'Crafting',            pts: 0.3, dev: "System Code", deps: ['ga-cr','sy-00'] };
@@ -400,9 +409,9 @@ function addCrafting(entries) {
 }
 
 function addUpgrades(entries) {  
-  entries['ca-up'] = { pk: 'CONCEPT', sum: 'Upgrades',            pts: 0.6, dev: "Illustration", deps: ['ca-00'] };
-  entries['ga-up'] = { pk: 'GAME',    sum: 'Upgrades',            pts: 0.3, dev: "Design Update", deps: ['ca-up','ga-cr'] };
-  entries['3d-up'] = { pk: '3D',      sum: 'Upgrades',            pts: 0.3, dev: "FBX 3D Model", deps: ['ca-up','ga-up','3d-00'] };
+  entries['ca-00'].pts += 0.6;
+  entries['ga-up'] = { pk: 'GAME',    sum: 'Upgrades',            pts: 0.3, dev: "Design Update", deps: ['ca-00','ga-cr'] };
+  entries['3d-up'] = { pk: '3D',      sum: 'Upgrades',            pts: 0.3, dev: "FBX 3D Model", deps: ['ca-00','ga-up','3d-00'] };
   entries['te-up'] = { pk: 'TEXTURE', sum: 'Upgrades',            pts: 0.3, dev: "PBR Texture Set", deps: ['3d-up','te-00'] };
   entries['sy-up'] = { pk: 'CODE',    sum: 'Upgrades',            pts: 0.3, dev: "System Code", deps: ['ga-up'] };
   entries['ui-up'] = { pk: 'UI',      sum: 'Upgrades',            pts: 0.3, dev: "UI Update", deps: ['sy-up','u3-00','u3-md'] };
@@ -411,9 +420,9 @@ function addUpgrades(entries) {
 }
 
 function addHarvesting(entries) {
-  entries['ca-ha'] = { pk: 'CONCEPT', sum: 'Harvesting',          pts: 0.6, dev: "Illustration", deps: ['ca-00'] };
-  entries['ga-ha'] = { pk: 'GAME',    sum: 'Harvesting',          pts: 0.3, dev: "Design Update", deps: ['ca-ha','ga-in'] };
-  entries['3d-ha'] = { pk: '3D',      sum: 'Harvesting',          pts: 0.3, dev: "FBX 3D Model", deps: ['ca-ha','ga-ha','3d-00'] };
+  entries['ca-00'].pts += 0.6;
+  entries['ga-ha'] = { pk: 'GAME',    sum: 'Harvesting',          pts: 0.3, dev: "Design Update", deps: ['ca-00','ga-in'] };
+  entries['3d-ha'] = { pk: '3D',      sum: 'Harvesting',          pts: 0.3, dev: "FBX 3D Model", deps: ['ca-00','ga-ha','3d-00'] };
   entries['sy-ha'] = { pk: 'CODE',    sum: 'Harvesting',          pts: 0.3, dev: "System Code", deps: ['ga-ha'] };
   entries['ui-ha'] = { pk: 'UI',      sum: 'Harvesting',          pts: 0.3, dev: "UI Update", deps: ['sy-ha','u3-00','u3-md'] };
   entries['u3-ha'] = { pk: 'UNITY',   sum: 'Harvesting',          pts: 0.3, dev: "Unity3D Metadata or Component", deps: ['3d-ha','sy-ha','ui-ha'] };
@@ -421,9 +430,9 @@ function addHarvesting(entries) {
 }
 
 function addFoodPreparation(entries) {
-  entries['ca-fp'] = { pk: 'CONCEPT', sum: 'Food Preparation',    pts: 0.6, dev: "Illustration", deps: ['ca-00'] };
-  entries['ga-fp'] = { pk: 'GAME',    sum: 'Food Preparation',    pts: 0.3, dev: "Design Update", deps: ['ca-fp','ga-in'] };
-  entries['3d-fp'] = { pk: '3D',      sum: 'Food Preparation',    pts: 0.3, dev: "FBX 3D Model", deps: ['ca-fp','ga-fp','3d-00'] };
+  entries['ca-00'].pts += 0.6;
+  entries['ga-fp'] = { pk: 'GAME',    sum: 'Food Preparation',    pts: 0.3, dev: "Design Update", deps: ['ca-00','ga-in'] };
+  entries['3d-fp'] = { pk: '3D',      sum: 'Food Preparation',    pts: 0.3, dev: "FBX 3D Model", deps: ['ca-00','ga-fp','3d-00'] };
   entries['sy-fp'] = { pk: 'CODE',    sum: 'Food Preparation',    pts: 0.3, dev: "System Code", deps: ['ga-fp'] };
   entries['ui-fp'] = { pk: 'UI',      sum: 'Food Preparation',    pts: 0.3, dev: "UI Update", deps: ['sy-fp','u3-00','u3-md'] };
   entries['u3-fp'] = { pk: 'UNITY',   sum: 'Food Preparation',    pts: 0.3, dev: "Unity3D Metadata or Component", deps: ['3d-fp','sy-fp','ui-fp'] };
@@ -912,9 +921,8 @@ function getHarvestablePlant(entries, sharedDeps, sharedTags) {
   addDetails(entries);
   addHarvesting(entries);
   
-  entries["ca-00"].points *= 1.5;
+  delete entries['ca-00'];
   entries["ga-00"].points *= 1.5;
-  // delete entries['ca-ha'];
 
   sharedTags.push('Harvestable')
   sharedTags.push('Flora');
@@ -953,25 +961,21 @@ function getGrass(entries, sharedDeps, sharedTags) {
 function getFern(entries, sharedDeps, sharedTags) {
   getHarvestablePlant(entries, sharedDeps, sharedTags);
   sharedTags.push('Fern');
-  delete entries['ca-ha'];
 }
 
 function getSeaweed(entries, sharedDeps, sharedTags) {
   getHarvestablePlant(entries, sharedDeps, sharedTags);
   sharedTags.push('Seaweed');
-  delete entries['ca-ha'];
 }
 
 function getLichen(entries, sharedDeps, sharedTags) {
   getHarvestablePlant(entries, sharedDeps, sharedTags);
   sharedTags.push('Lichen');
-  delete entries['ca-ha'];
 }
 
 function getMushroom(entries, sharedDeps, sharedTags) {
   getHarvestablePlant(entries, sharedDeps, sharedTags);
   sharedTags.push('Mushroom');
-  delete entries['ca-ha'];
 }
 
 function getGenericPlant(entries, sharedDeps, sharedTags) {  
@@ -984,7 +988,6 @@ function getGenericPlant(entries, sharedDeps, sharedTags) {
   addModels(entries);
 
   delete entries['ca-00'];
-  delete entries['ca-ha'];
 
   sharedTags.push('Flora');
 }
