@@ -30,40 +30,52 @@ function getIssueName(v, parentIssue) {
   return (parentIssue.summary + " " + v.sum).trim();
 }
 
+function doWithCatch(action, message){
+  try{
+    action();
+  }
+  catch(error){    
+    console.error("ERROR [" + error + "].  Occurred while " + message + ".");
+    throw error;
+  }
+}
+
 function updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner, watchers) { 
   
-  parentIssue.links["parent for"].add(existing);
 
-  existing.summary = getIssueName(v, parentIssue);
-  existing.project = project;
-  existing.fields["Target Release"] = parentIssue.fields["Target Release"];
+  doWithCatch(() => parentIssue.links["parent for"].add(existing), "linking issue to parent");
+  
 
-  existing.addTag(tag);
-  existing.addTag("Auto-Generated");
+  doWithCatch(() => existing.summary = getIssueName(v, parentIssue), "setting issue summary");
+  doWithCatch(() => existing.project = project, "setting issue project: " + JSON.stringify(project));
+  doWithCatch(() => existing.fields["Target Release"] = parentIssue.fields["Target Release"], "setting issue target release");
+
+  doWithCatch(() => existing.addTag(tag), "adding general tag: " + JSON.stringify(tag));
+  doWithCatch(() => existing.addTag("Auto-Generated"), "adding Auto-Generated tag");
 
   const tag2 = cleanTag(v.sum);
 
   if (tag2 !== "") {
-    existing.addTag(tag2);
+    doWithCatch(() => existing.addTag(tag2), "adding specific tag");
   }
 
   // contract protected fields
   if (existing.fields["State"].name == "Not Ready" || existing.fields["State"].name == "Open")
   {
-    existing.fields.Assignee = user;
-    existing.fields.Points = v.pts;
-    existing.fields.Owner = owner;
-    existing.fields["Deliverable"] = v.dev;
+    doWithCatch(() => existing.fields.Assignee = user, "setting issue assignee: " + JSON.stringify(user));
+    doWithCatch(() => existing.fields.Points = v.pts, "setting issue points: " + JSON.stringify(v.pts));
+    doWithCatch(() => existing.fields.Owner = owner, "setting issue owner: " + JSON.stringify(owner));
+    doWithCatch(() => existing.fields["Deliverable"] = v.dev, "setting issue deliverable: " + JSON.stringify(v.dev));
   }  
 
   for (const watcher of watchers) {
-    watcher.watchIssue(existing); 
+    doWithCatch(() => watcher.watchIssue(existing), "adding issue watcher: " + JSON.stringify(watcher));
   }
 }
 
 function updateLinks(issues, entries) {
   for (const [k, issue] of Object.entries(issues)) {
-    entry = entries[k];
+    var entry = entries[k];
 
     entry.deps.forEach((dk) => {
       const dependency = issues[dk];
@@ -110,21 +122,22 @@ function createComplexIssues(
   for (const [k, v] of Object.entries(entries)) {
     var project = entities.Project.findByKey(v.pk);
     var userName = appalachia_entities.assignees[v.pk];
+    console.log(userName);
     var user = entities.User.findByLogin(userName);
     var watchers = [ entities.User.findByLogin(appalachia_entities.users.chris) ];
     var owner = appalachia_entities.owners[userName];
     var issueName = getIssueName(v, parentIssue);
 
-    qpr = "project: {" + project.name + "}";
-    qpa = "summary: '" + issueName + "'";
-    //qsa = "State: {Not Ready},Open,{In Progress}";
-    qst = "Subtask of: " + parentIssue.id;
-    qde = "Is required for: " + parentIssue.id;
-    //qvs = "'"  "'";
+    var qpr = "project: {" + project.name + "}";
+    var qpa = "summary: '" + issueName + "'";
+    //var qsa = "State: {Not Ready},Open,{In Progress}";
+    var qst = "Subtask of: " + parentIssue.id;
+    var qde = "Is required for: " + parentIssue.id;
+    //var qvs = "'"  "'";
 
-    and = ' and ';
+    var and = ' and ';
 
-    queries = [];
+    var queries = [];
 
     //if (v.sum == '' ) {
       queries.push(qpr + and + qpa/* + and + qsa*/ + and + qst);
@@ -148,7 +161,7 @@ function createComplexIssues(
       updateIssue(ctx, existing, v, parentIssue, tag, project, user, owner, watchers);
     } catch (error) {
 
-      console.error(error + ": " + JSON.stringify(v));
+      console.error("ERROR [" + error + "].  Occurred while processing entry: " + JSON.stringify(v));
       throw error;
     }
 
@@ -663,7 +676,7 @@ function getSystem(entries, sharedDeps, sharedTags) {
 
 function addScreen(entries) {
   entries['ca-00'].pts *= 3.0;
-  entries['ca-00'].sum = 'UI Concept Art'
+  entries['ca-00'].sum = 'UI Concept Art';
   entries['ca-00'].pk = 'UICON';
 
   entries['qa-00'].pts *= 2.0;
@@ -719,9 +732,9 @@ function getWorld(entries, sharedDeps, sharedTags) {
   entries['le-00'] = { pk: 'LEVEL',   sum: 'Configuration', pts: 16.0, dev: "Unity3D Scene", deps: ['u3-md'] };
   entries['vf-99'] = { pk: 'VFX',     sum: 'Effects',       pts: 8.0, dev: "Unity3D VFX", deps: ['u3-md'] };
 
-  delete entries['ca-00']
+  delete entries['ca-00'];
 
-  sharedTags.length = 0
+  sharedTags.length = 0;
   sharedTags.push('Environment');
   sharedTags.push('World');
 }
@@ -760,8 +773,8 @@ function getBiome(entries, sharedDeps, sharedTags) {
   addPrefab(entries);
   addModels(entries);
 
-  delete entries['3d-00']
-  delete entries['ca-00']
+  delete entries['3d-00'];
+  delete entries['ca-00'];
   
   entries['ad-ss'] = { pk: 'AUDIO',   sum: 'Soundscape',          pts: 16.0, dev: "Unity3D Audio Mix", deps: ['ga-00'] };
   entries['vf-ps'] = { pk: 'VFX',     sum: 'Particle Systems',    pts: 8.0, dev: "Unity3D VFX", deps: ['u3-00'] };
@@ -799,8 +812,8 @@ function getWeather(entries, sharedDeps, sharedTags) {
   addPrefab(entries);
   addModels(entries);
 
-  delete entries['3d-00']
-  delete entries['ca-00']
+  delete entries['3d-00'];
+  delete entries['ca-00'];
 
   entries['vf-op'] = { pk: 'VFX',     sum: 'Screen Effects',          pts: 8.0, dev: "Unity3D Shader", deps: ['u3-00'] };
   entries['u3-bi'] = { pk: 'LEVEL',   sum: 'Weather Configuration',   pts: 8.0, dev: "Unity3D Prefab", deps: ['vf-op'] };
@@ -819,7 +832,7 @@ function getCave(entries, sharedDeps, sharedTags) {
   addPrefab(entries);
   addModels(entries);
 
-  delete entries['ca-00']
+  delete entries['ca-00'];
   
   entries['u3-si'] = { pk: 'UNITY',   sum: 'Lightmapping',      pts: 3.0, dev: "Unity3D Metadata or Component", deps: ['u3-00'] };
   entries['u3-si'] = { pk: 'LEVEL',   sum: 'Scene Integration', pts: 3.0, dev: "Unity3D Metadata or Component", deps: ['u3-00'] };
@@ -865,6 +878,8 @@ function getMammal(entries, sharedDeps, sharedTags) {
   addQuadruped(entries);
   addPathfinding(entries);
 
+  delete entries['ca-sy'];
+
   sharedTags.push('Fauna');
   sharedTags.push('Mammal');
 }
@@ -875,6 +890,8 @@ function getBird(entries, sharedDeps, sharedTags) {
   addFeathers(entries);
   addSimplePathfinding(entries);
 
+  delete entries['ca-sy'];
+
   sharedTags.push('Fauna');
   sharedTags.push('Bird');
 }
@@ -883,6 +900,8 @@ function getFish(entries, sharedDeps, sharedTags) {
   addAnimal(entries);
   addAI(entries);
   addHerd(entries);
+
+  delete entries['ca-sy'];
 
   sharedTags.push('Fauna');
   sharedTags.push('Fish');
@@ -894,6 +913,8 @@ function getReptile(entries, sharedDeps, sharedTags) {
   addPathfinding(entries);
   addQuadruped(entries);
 
+  delete entries['ca-sy'];
+
   sharedTags.push('Fauna');
   sharedTags.push('Reptile');
 }
@@ -903,6 +924,8 @@ function getAmphibian(entries, sharedDeps, sharedTags) {
   addAI(entries);
   addPathfinding(entries);
   addQuadruped(entries);
+
+  delete entries['ca-sy'];
 
   sharedTags.push('Fauna');
   sharedTags.push('Amphibian');
@@ -922,9 +945,10 @@ function getHarvestablePlant(entries, sharedDeps, sharedTags) {
   addHarvesting(entries);
   
   delete entries['ca-00'];
+  delete entries['ca-sy'];
   entries["ga-00"].points *= 1.5;
 
-  sharedTags.push('Harvestable')
+  sharedTags.push('Harvestable');
   sharedTags.push('Flora');
 }
 
@@ -988,6 +1012,7 @@ function getGenericPlant(entries, sharedDeps, sharedTags) {
   addModels(entries);
 
   delete entries['ca-00'];
+  delete entries['ca-sy'];
 
   sharedTags.push('Flora');
 }
@@ -1003,6 +1028,8 @@ function getFood(entries, sharedDeps, sharedTags) {
   addDetails(entries);
   addFoodPreparation(entries);
 
+  delete entries['ca-sy'];
+  
   sharedTags.push('Food');
 }
 
@@ -1151,7 +1178,7 @@ function populateFeatures(ctx) {
   const category = ctx.issue.fields["Category"].presentation;
 
   const entries = {};
-  const sharedDeps = []
+  const sharedDeps = [];
   const sharedTags = [];
 
   switch(category) {
