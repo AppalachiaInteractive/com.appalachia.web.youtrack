@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/AppalachiaInteractive/com.appalachia.web.youtrack/issues"
   },
-  "homepage": "https://github.com/AppalachiaInteractive/com.appalachia.web.youtrack#readme"
+  "homepage": "https://github.com/AppalachiaInteractive/com.appalachia.web.youtrack#readme",
+  "devDependencies": {
+    "@jetbrains/youtrack-scripting": "0.0.24",
+    "@jetbrains/youtrack-scripting-api": "^2021.3.26792",
+    "youtrack-rest-client": "^1.4.0"
+  }
 }
