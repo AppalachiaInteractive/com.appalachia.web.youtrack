@@ -9,6 +9,10 @@ const users = {
   TBD: "TBD"
 };
 
+const tokens = {};
+tokens[users.chris] = 'perm:Y2hyaXM=.NTYtMg==.taBXzTxB9doOfr0drE38hCnRUC5VIv';
+tokens[users.janice] = 'perm:amFuaWNl.NTYtMw==.ahMuLlZKfbdDsNfOXXQd35RFB1EM8C';
+
 const owners = {};
 owners[users.bokbok] = "Bok Bok Productions";
 owners[users.chris] = "Appalachia Interactive";
@@ -129,6 +133,7 @@ assignees[project_keys.VFX] = users.chris;
 module.exports = {
   users: users,
   owners: owners,
+  tokens: tokens,
   project_keys: project_keys,
   all_project_keys: all_project_keys,
   assignees: assignees,
